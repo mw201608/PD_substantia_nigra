@@ -162,3 +162,27 @@ SubsetByGroup <- function(x, n = 1000, seed = 13456){
                 y
         }, n = n),x)
 }
+DoHeatmap3 <- function(object, feature_df, group.col = 'group', id.col = 'Geneid', symbol.col = 'Symbol', assay = 'SCT', slot = 'scale.data', size = 1, row_text_size = 3.5, z_transform = ifelse(slot == 'scale.data', FALSE, TRUE), ...){
+        #plot heatmap using selected grouped features from data in Seurat object
+        #feature_df, a data.frame with columns group.col, id.col, and symbol.col
+        #variables in group.col and symbol.col will be concatenated to become the new feature names
+        #size, Size of text above color bar
+        i = feature_df[, id.col] %in% rownames(slot(object@assays[[assay]], slot))
+        if(any(! i)){
+                warning(paste0('Those features are not present in the slot and hence will be omitted from slot ', slot, ': ', paste(feature_df[!i, symbol.col], collapse = ', ')))
+                feature_df = feature_df[i, ]
+        }
+        if(nrow(feature_df) == 0) stop("No feature left for plot\n")
+        rownames(feature_df) = paste(feature_df[, symbol.col], feature_df[, group.col])
+        so1 = lapply(split(feature_df, feature_df[, group.col]), function(x){
+                so0 = object[x[, id.col], ]
+                rownames(slot(so0@assays[[assay]], slot)) = rownames(x)
+                so0
+        })
+        slot(so1[[1]]@assays[[assay]], slot) = SoMergeDataSlot(so1, assay = assay, slot = slot); so1 = so1[[1]]
+        if(z_transform){
+                s = colnames(slot(so1@assays[[assay]], slot))
+                slot(so1@assays[[assay]], slot) = t(apply(slot(so1@assays[[assay]], slot), 1, scale))
+                colnames(slot(so1@assays[[assay]], slot)) = s
+        }
+        DoHeatmap(so1, features = rownames(feature_df), assay=assay, slot=slot, size = size, ...) + theme(text = element_text(size = row_text_size))
