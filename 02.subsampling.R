@@ -20,14 +20,13 @@ cocp <- lapply(levels(Idents(SeuratObject)), function(x, clusters, subSampleClus
 	CoClusterProbability(x = names(clusters)[clusters == x], clusters = clusters, subSampleClusters = subSampleClusters)
 }, clusters = Idents(SeuratObject), subSampleClusters = subClusts)
 
-save.rds(cocp, file = paste0(subClusterDir, 'stableClusters.cocp.', Ident1, '.RDS'))
+saveRDS(cocp, file = paste0(subClusterDir, 'stableClusters.cocp.', Ident1, '.RDS'))
 #
 cocp_mean = lapply(cocp, function(cocp1) lapply(cocp1, function(x) rowMeans(x, na.rm = TRUE)))
 cocp_mean = lapply(cocp_mean, function(cocp1) do.call(rbind, lapply(names(cocp1), function(x) df0(Cluster = x, Cell = names(cocp1[[x]]), Proportion = cocp1[[x]]))))
 names(cocp_mean) = levels(Idents(SeuratObject))
 cocp_mean = do.call(rbind, lapply(names(cocp_mean), function(x) df0(Target = x, cocp_mean[[x]])))
-write.tsv(cocp_mean, file = paste0(subClusterDir, "CoClusterDist.", Ident1, ".tsv"))
-cocp_mean = read.tsv(file = paste0(subClusterDir, "CoClusterDist.", Ident1, ".tsv"))
+write.table(cocp_mean, file = paste0(subClusterDir, "CoClusterDist.", Ident1, ".tsv"), col.names = TRUE, row.names = FALSE, sep = "\t", quote = FALSE)
 #
 cocp_mean$Target = factor(cocp_mean$Target, levels = sort(as.integer(unique(as.character(cocp_mean$Target)))))
 cocp_mean$Cluster = factor(cocp_mean$Cluster, levels = sort(as.integer(unique(as.character(cocp_mean$Cluster)))))
