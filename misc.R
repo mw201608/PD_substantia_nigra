@@ -151,3 +151,14 @@ computeSeuratClusterMarkers <- function(x, logfc.threshold = log(2), method = c(
 	#
 	do.call(rbind, markers)
 }
+SubsetByGroup <- function(x, n = 1000, seed = 13456){
+        #x is a vector of group ids
+        #maximum number of elements to be selected per cluster
+        #return a vector TRUE/FALSE indicating whether the elements will be selected
+        set.seed(seed)
+        unsplit(lapply(split(x, x), function(x, n){
+                y = rep(TRUE, length(x))
+                if(length(x) > n) y[- sample(length(x), n)] = FALSE
+                y
+        }, n = n),x)
+}
