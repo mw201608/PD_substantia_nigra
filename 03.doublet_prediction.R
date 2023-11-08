@@ -1,4 +1,6 @@
 #Doublet prediction
+library(scDblFinder)
+library(scater)
 dblOutdir <- 'dblFinder/'
 #First merge un-stable clusters C12 and C13 to C0
 Ident_final = 'Cluster_final'
