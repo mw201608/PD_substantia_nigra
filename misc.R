@@ -71,3 +71,45 @@ CoClusterProbability <- function(x, clusters, subSampleClusters) {
     }
     result
 }
+VlnPlot2 <- function(pp, genes, varList, axis.text.x.size=7, axis.text.y.size=7, axis.title.x.size = 7, axis.title.y.size = 7, ncol = 1, n.breaks.y = NULL, feature.label.position = 'left', strip.text.x.angle = NULL, strip.position = 'top'){
+        stopifnot(is.list(pp))
+        if(is(pp, 'ggplot')){ #for stacked VlnPlot
+                pp$data[, 'feature'] = genes[as.character(pp$data[, 'feature']), 'Symbol']
+                pp$data[, 'feature'] = factor(pp$data[, 'feature'], levels = varList)
+                if(!is.null(strip.text.x.angle)) pp$theme$strip.text.x$angle <- strip.text.x.angle
+                pp$theme$axis.text.x$size <- axis.text.x.size
+                pp$theme$axis.text.y$size <- axis.text.y.size
+                pp$theme$axis.title.x$size <- axis.title.x.size
+                pp$theme$axis.title.y$size <- axis.title.y.size
+                if(strip.position == 'bottom') pp$facet$params$switch <- 'x'
+                return(pp)
+        }
+        for(i in 1:length(pp)){
+                ppn=genes[pp[[i]]$labels$title, 'Symbol']
+                if(is.na(ppn)){
+                        cat('Try to rename', pp[[i]]$labels$title, '\n')
+                        if(grepl('^rna_', pp[[i]]$labels$title, ignore.case = TRUE)) pp[[i]]$labels$title = sub('^rna_', '', pp[[i]]$labels$title, ignore.case = TRUE)
+                        if(grepl('^sct_', pp[[i]]$labels$title, ignore.case = TRUE)) pp[[i]]$labels$title = sub('^sct_', '', pp[[i]]$labels$title, ignore.case = TRUE)
+                        ppn = genes[pp[[i]]$labels$title, 'Symbol']
+                }
+                pp[[i]] <- pp[[i]] + theme(axis.ticks.x=element_blank(), axis.title.x=element_blank(), axis.text.x=element_text(size=axis.text.x.size), 
+                        axis.text.y=element_text(size=axis.text.y.size), axis.title.y=element_text(size=axis.title.y.size)) + 
+                        guides(color='none', fill='none')
+                if(!is.null(n.breaks.y)) pp[[i]] <- pp[[i]] + scale_y_continuous(n.breaks = n.breaks.y)
+                if(feature.label.position == 'left'){
+                        pp[[i]] <- pp[[i]] + labs(title=NULL, y=ppn)
+                }else{
+                        annotations <- data.frame(xpos = -Inf, ypos = Inf, annotateText = paste0('  ', ppn), hjustvar = 0, vjustvar = 1)
+                        pp[[i]] <- pp[[i]] + labs(y = NULL, title = NULL) + geom_text(data = annotations, aes(x=xpos, y=ypos, hjust=hjustvar,
+                                vjust=vjustvar, label=annotateText), inherit.aes = FALSE)
+                }
+                if(is.na(ppn)){
+                        cat('Can not map symbol for', pp[[i]]$labels$title, '\n')
+                        next
+                }
+                names(pp)[i]=ppn
+                if(ppn!=varList[length(varList)]) pp[[i]] <- pp[[i]] + theme(axis.text.x = element_blank())
+        }
+        pp = pp[varList [varList %in% names(pp)] ]
+        patchwork:::wrap_plots(pp, ncol = ncol)
+}
