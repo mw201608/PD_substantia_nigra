@@ -113,3 +113,41 @@ VlnPlot2 <- function(pp, genes, varList, axis.text.x.size=7, axis.text.y.size=7,
         pp = pp[varList [varList %in% names(pp)] ]
         patchwork:::wrap_plots(pp, ncol = ncol)
 }
+computeSeuratClusterMarkers <- function(x, logfc.threshold = log(2), method = c('FindConservedMarkers', 'FindMarkers'), test.use = 'wilcox', grouping.var = NULL, assay = NULL, slot = "data", idents.test = NULL){
+	method = match.arg(method)
+	library(Seurat)
+	cat('Compute cluster markers using method', method, '\n')
+	if(method == 'FindConservedMarkers' && is.null(grouping.var)) stop("grouping.var can not be NULL\n")
+	if(is.null(idents.test)) idents.test = levels(Idents(x))
+	if(length(idents.test) == length(Idents(x))) stop('idents.test is likely wrongly sepcified')
+	if(! all(idents.test %in% levels(Idents(x))) ) stop('Invalid value in idents.test\n')
+	if(method == 'FindConservedMarkers' && is.null(assay)) assay = 'RNA'
+	markers <- list()
+	for(c1 in idents.test){
+			cat('Do cluster', c1, '...\n')
+			if(method == 'FindConservedMarkers'){
+				markers1 <- try(FindConservedMarkers(x, ident.1 = c1, grouping.var = grouping.var, assay = assay, slot = slot, logfc.threshold = logfc.threshold, verbose = TRUE), silent = TRUE)
+			}else{
+				markers1 <- try(FindMarkers(x, assay = assay, slot = slot, ident.1 = c1, logfc.threshold = logfc.threshold, test.use = test.use), silent = TRUE)
+			}
+			if (inherits(markers1, "try-error")){
+				print(markers1)
+				next
+			}
+			if(nrow(markers1) > 0) markers[[c1]] <- df0(Geneid = rownames(markers1), Cluster = c1, markers1)
+	}
+	if(length(markers) == 0){
+		stop("No validate results obtained. Please check your data.\n")
+	}
+	nc1 = sapply(markers, ncol)
+	if(any(nc1 < max(nc1))){
+		j = which(nc1 < max(nc1)) #Assume max contains all
+		i = which.max(nc1)
+		for(k in j){
+			for(s in setdiff(colnames(markers[[i]]), colnames(markers[[k]]))) markers[[k]][, s] = NA
+			markers[[k]] = markers[[k]][, colnames(markers[[i]])]
+		}
+	}
+	#
+	do.call(rbind, markers)
+}
