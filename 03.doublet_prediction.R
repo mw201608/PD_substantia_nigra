@@ -20,7 +20,7 @@ for(s1 in unique(SeuratObject@meta.data$Sample)){
 	dbl_classifi0 <- colData(dbl_classifi0)
 	dbl_classifi <- rbind(dbl_classifi, df0(Sample = s1, Barcode = rownames(dbl_classifi0), dbl_classifi0))
 }
-write.tsv(dbl_classifi, file = paste0(dblOutdir, 'dbl.classification.', Ident1, '.tsv'))
+write.table(dbl_classifi, file = paste0(dblOutdir, 'dbl.classification.', Ident1, '.tsv'), col.names = TRUE, row.names = FALSE, sep = "\t", quote = FALSE)
 #
 SeuratObject@meta.data$scDblFinder.score <- dbl_classifi[match(SeuratObject@meta.data$Barcode, dbl_classifi$Barcode), 'scDblFinder.score']
 SeuratObject@meta.data$scDblFinder.class <- dbl_classifi[match(SeuratObject@meta.data$Barcode, dbl_classifi$Barcode), 'scDblFinder.class']
