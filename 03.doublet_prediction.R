@@ -42,4 +42,4 @@ print(p4)
 #**********************************************
 # Create a clean version
 SeuratObject <- SeuratObject[, SeuratObject@meta.data[, 'scDblFinder.class'] == 'singlet']
-save.rds(SeuratObject, paste0(outdir, 'dbl.classification.SeuratObject.clean.', Ident1, '.RDS'))
+saveRDS(SeuratObject, paste0(outdir, 'dbl.classification.SeuratObject.clean.', Ident1, '.RDS'))
