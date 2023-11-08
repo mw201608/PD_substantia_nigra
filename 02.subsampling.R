@@ -13,7 +13,7 @@ jrcp1 <- JaccardRainCloudPlot(subOrgins, subClusts)
 print(jrcp1)
 #
 stableClusters <- AssignStableCluster(subOrgins, subClusts, jaccard_cutoff = 0.6, method = "jaccard_percent", percent_cutoff = 0.6)
-save.rds(stableClusters, file = paste0(subClusterDir, 'stableClusters.jaccard_0.6.', Ident1, '.RDS'))
+saveRDS(stableClusters, file = paste0(subClusterDir, 'stableClusters.jaccard_0.6.', Ident1, '.RDS'))
 #
 cocp <- lapply(levels(Idents(SeuratObject)), function(x, clusters, subSampleClusters){
 	cat('Compute cluster', x, '...\n')
