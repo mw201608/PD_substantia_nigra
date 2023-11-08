@@ -4,8 +4,7 @@ library(harmony)
 library(dplyr)
 library(Matrix)
 library(patchwork)
-library(future)
-options(future.globals.maxSize= 1024^100)
+#
 outdir <- 'output/'
 #Read in pre-merged count matrix data
 SeuratObject <- readRDS("PD.paper.seuratObject.RDS") #data available at https://www.synapse.org/#!Synapse:syn52911948
