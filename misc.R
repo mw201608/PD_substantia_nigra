@@ -186,3 +186,18 @@ DoHeatmap3 <- function(object, feature_df, group.col = 'group', id.col = 'Geneid
                 colnames(slot(so1@assays[[assay]], slot)) = s
         }
         DoHeatmap(so1, features = rownames(feature_df), assay=assay, slot=slot, size = size, ...) + theme(text = element_text(size = row_text_size))
+}
+df0 <- function (..., row.names = NULL, check.rows = FALSE, check.names = TRUE, 
+    fix.empty.names = TRUE, stringsAsFactors = FALSE) 
+{
+    if (grepl("fix.empty.names", paste(format(args(data.frame)), 
+        collapse = ""))) {
+        data.frame(..., row.names = row.names, check.rows = check.rows, 
+            check.names = check.names, fix.empty.names = fix.empty.names, 
+            stringsAsFactors = stringsAsFactors)
+    }
+    else {
+        data.frame(..., row.names = row.names, check.rows = check.rows, 
+            check.names = check.names, stringsAsFactors = stringsAsFactors)
+    }
+}
