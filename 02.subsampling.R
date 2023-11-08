@@ -1,6 +1,6 @@
 # Cluster stability and robustness analysis by sub-sampling
 subClusterDir = 'scclust/'
-source('subsampling.R')
+source('misc.R')
 vars.to.regress = c('Sex', 'Age', 'PMI')
 so1 <- CreateSeuratObject(counts = GetAssayData(SeuratObject, slot = 'counts'), min.cells = 0, min.features = 0, names.field = 2, names.delim = '.', meta.data = SeuratObject@meta.data)
 so1$RNA_snn_res.0.2 <- so1$seurat_clusters <- NULL
