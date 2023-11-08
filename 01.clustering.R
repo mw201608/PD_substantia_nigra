@@ -28,3 +28,4 @@ SeuratObject <- RunUMAP(SeuratObject, dims = 1:20, reduction = "harmony", verbos
 SeuratObject <- RunTSNE(SeuratObject, dims = 1:20, reduction = "harmony", verbose = FALSE)
 SeuratObject <- FindNeighbors(SeuratObject, dims = 1:20, reduction = "harmony", verbose = FALSE)
 SeuratObject <- FindClusters(SeuratObject, resolution = 0.2, verbose = FALSE)
+Ident1 <- 'RNA_snn_res.0.2'
