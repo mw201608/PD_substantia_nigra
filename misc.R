@@ -201,3 +201,7 @@ df0 <- function (..., row.names = NULL, check.rows = FALSE, check.names = TRUE,
             check.names = check.names, stringsAsFactors = stringsAsFactors)
     }
 }
+SoMergeDataSlot = function(so_list, assay='SCT', slot = 'data'){
+	do.call(rbind, lapply(so_list, function(x) slot(x@assays[[assay]], slot)))
+}
+			      
